@@ -23,8 +23,6 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  private blacklistToken = new Set<string>();
-
   async register(@Res() response, dto: RegisterDto): Promise<any> {
     try{
       const hash = await argon.hash(dto.password);
@@ -80,8 +78,6 @@ export class AuthService {
           },
         },
       );
-      const token = request.headers.authorization?.split(' ')[1];
-      if (token) await this.invalidateToken(token);
       return response.status(HttpStatus.OK).json({
         message: 'Logout successfully',
       });
@@ -141,13 +137,5 @@ export class AuthService {
       access_token: at,
       refresh_token: rt,
     };
-  }
-
-  async invalidateToken(token: string) {
-    this.blacklistToken.add(token);
-  }
-
-  async isTokenBlacklisted(token: string): Promise<boolean> {
-    return this.blacklistToken.has(token);
   }
 }

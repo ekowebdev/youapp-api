@@ -7,7 +7,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './common/guards';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BlacklistMiddleware } from './middleware/blacklist.middleware';
 
 @Module({
   imports: [
@@ -25,10 +24,4 @@ import { BlacklistMiddleware } from './middleware/blacklist.middleware';
     AppService,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(BlacklistMiddleware)
-      .forRoutes({ path: '/logout', method: RequestMethod.POST });
-  }
-}
+export class AppModule {}
