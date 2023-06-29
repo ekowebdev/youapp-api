@@ -4,20 +4,22 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 
-import {
-  Public,
-  GetCurrentUserId,
-  GetCurrentUser,
-} from '../common/decorators';
-import { AtGuard, RtGuard } from '../common/guards';
+import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
+import { AccessTokenGuard, RefreshTokenGuard } from '../common/guards';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from '../auth/dto';
 import { Token } from '../auth/types';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { User } from './entites/user.entity';
 
 @Controller()
@@ -42,25 +44,25 @@ export class AuthController {
     return this.authService.login(response, dto);
   }
 
-  @UseGuards(AtGuard)
+  @UseGuards(AccessTokenGuard)
   @Post('logout')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout' })
   @ApiOkResponse({ status: 200 })
   @HttpCode(HttpStatus.OK)
-  logout(@Res() response, @GetCurrentUserId() userId): Promise<boolean> {
-    return this.authService.logout(response, userId);
+  logout(@Req() request, @Res() response, @GetCurrentUserId() userId): Promise<boolean> {
+    return this.authService.logout(request, response, userId);
   }
 
   @Public()
-  @UseGuards(RtGuard)
+  @UseGuards(RefreshTokenGuard)
   @Post('refreshToken')
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt-refresh')
   @ApiOperation({ summary: 'Refresh Token' })
   @ApiOkResponse({ status: 200 })
   @HttpCode(HttpStatus.OK)
   refreshToken(
-    @Res() response, 
+    @Res() response,
     @GetCurrentUserId() userId: number,
     @GetCurrentUser('refreshToken') refreshToken: string,
   ): Promise<Token> {

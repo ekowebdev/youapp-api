@@ -20,18 +20,23 @@ import { CreateProfileDto, UpdateProfileDto } from './dto';
 import {} from './dto/update.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
-import { AtGuard } from '../common/guards';
+import { AccessTokenGuard } from '../common/guards';
 import { GetCurrentUser, GetCurrentUserId } from '../common/decorators';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { Profile } from './schemas/profile.schema';
 
 @Controller()
 export class ProfileController {
-  constructor(
-    private readonly profileService: ProfileService,
-  ) {}
+  constructor(private readonly profileService: ProfileService) {}
 
-  @UseGuards(AtGuard)
+  @UseGuards(AccessTokenGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -102,18 +107,14 @@ export class ProfileController {
       new ParseFilePipe({
         fileIsRequired: false,
       }),
-    ) uploadFile: Express.Multer.File,
+    )
+    uploadFile: Express.Multer.File,
     @Body() dto: CreateProfileDto,
   ): Promise<any> {
-    return this.profileService.create(
-      response,
-      uploadFile,
-      dto,
-      currentUser,
-    );
+    return this.profileService.create(response, uploadFile, dto, currentUser);
   }
 
-  @UseGuards(AtGuard)
+  @UseGuards(AccessTokenGuard)
   @Get('getProfile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get Profile User' })
@@ -123,7 +124,7 @@ export class ProfileController {
     return this.profileService.get(response, currentUser);
   }
 
-  @UseGuards(AtGuard)
+  @UseGuards(AccessTokenGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -194,18 +195,14 @@ export class ProfileController {
       new ParseFilePipe({
         fileIsRequired: false,
       }),
-    ) uploadFile: Express.Multer.File,
+    )
+    uploadFile: Express.Multer.File,
     @Body() dto: UpdateProfileDto,
   ): Promise<any> {
-    return this.profileService.update(
-      response,
-      currentUser,
-      uploadFile,
-      dto,
-    );
+    return this.profileService.update(response, currentUser, uploadFile, dto);
   }
 
-  @UseGuards(AtGuard)
+  @UseGuards(AccessTokenGuard)
   @Delete('deleteProfile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete Profile User' })

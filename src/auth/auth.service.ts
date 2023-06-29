@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Req,
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +22,8 @@ export class AuthService {
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
+
+  private blacklistToken = new Set<string>();
 
   async register(@Res() response, dto: RegisterDto): Promise<any> {
     try{
@@ -64,7 +67,7 @@ export class AuthService {
     }
   }
 
-  async logout(@Res() response, userId: number): Promise<any> {
+  async logout(@Req() request, @Res() response, userId: number): Promise<any> {
     try {
       await this.userModel.updateMany(
         {
@@ -77,6 +80,8 @@ export class AuthService {
           },
         },
       );
+      const token = request.headers.authorization?.split(' ')[1];
+      if (token) await this.invalidateToken(token);
       return response.status(HttpStatus.OK).json({
         message: 'Logout successfully',
       });
@@ -136,5 +141,13 @@ export class AuthService {
       access_token: at,
       refresh_token: rt,
     };
+  }
+
+  async invalidateToken(token: string) {
+    this.blacklistToken.add(token);
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    return this.blacklistToken.has(token);
   }
 }
