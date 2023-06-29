@@ -1,6 +1,5 @@
 import {
   ForbiddenException,
-  Header,
   HttpException,
   HttpStatus,
   Injectable,
@@ -9,9 +8,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { LoginDto, RefreshTokenDto, RegisterDto } from './dto';
+import { LoginDto, RegisterDto } from './dto';
 import { JwtPayload } from './types';
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entites/user.entity';
 

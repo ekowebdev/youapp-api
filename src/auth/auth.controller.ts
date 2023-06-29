@@ -15,9 +15,9 @@ import {
 } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
 import { AuthService } from './auth.service';
-import { LoginDto, RefreshTokenDto, RegisterDto } from '../auth/dto';
+import { LoginDto, RegisterDto } from '../auth/dto';
 import { Token } from '../auth/types';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { User } from './entites/user.entity';
 
 @Controller()
@@ -27,26 +27,6 @@ export class AuthController {
   @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register User' })
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  //   description: 'Update Profile',
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       email: {
-  //         type: 'string',
-  //         format: 'email',
-  //       },
-  //       username: {
-  //         type: 'string',
-  //       },
-  //       password: {
-  //         type: 'string',
-  //         format: 'password',
-  //       }
-  //     },
-  //   },
-  // })
   @ApiCreatedResponse({ status: 201, type: User })
   @HttpCode(HttpStatus.CREATED)
   register(@Res() response, @Body() dto: RegisterDto): Promise<Token> {
@@ -56,23 +36,6 @@ export class AuthController {
   @Public()
   @Post('login')
   @ApiOperation({ summary: 'Login' })
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  //   description: 'Update Profile',
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       email: {
-  //         type: 'string',
-  //         format: 'email',
-  //       },
-  //       password: {
-  //         type: 'string',
-  //         format: 'password',
-  //       }
-  //     },
-  //   },
-  // })
   @ApiOkResponse({ status: 200 })
   @HttpCode(HttpStatus.OK)
   login(@Res() response, @Body() dto: LoginDto): Promise<Token> {
@@ -93,7 +56,6 @@ export class AuthController {
   @UseGuards(RtGuard)
   @Post('refreshToken')
   @ApiBearerAuth()
-  // @ApiBody({ schema: { properties: { refreshToken: { type: 'string' } } } })
   @ApiOperation({ summary: 'Refresh Token' })
   @ApiOkResponse({ status: 200 })
   @HttpCode(HttpStatus.OK)
